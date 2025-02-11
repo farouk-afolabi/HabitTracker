@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Habit Tracker</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="manifest" href="manifest.json">
 </head>
 <body>
   <div class="container">
@@ -21,5 +22,14 @@
     </div>
   </div>
   <script src="script.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('service-worker.js', {
+    scope: '/HabitTracker/'
+    })
+    .then(reg => console.log('Service Worker Registered'))
+    .catch(err => console.error('Service Worker Error:', err));
+    }
+   </script>
 </body>
 </html>
