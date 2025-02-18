@@ -1,39 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Habit Tracker</title>
-  <link rel="stylesheet" href="styles.css">
-  <link rel="manifest" href="manifest.json">
-</head>
-<body>
-  <div class="container">
-    <h1>Habit Tracker</h1>
-    <form id="habit-form">
-      <input type="text" id="habit-input" placeholder="Enter a new habit" required>
-      <input type="date" id="habit-date" required>
-      <button type="submit">Add Habit</button>
-    </form>
-    <ul id="habit-list"></ul>
-    <div id="stats">
-      <h2>Stats</h2>
-      <p>Total Habits: <span id="total-habits">0</span></p>
-      <p>Completion Rate: <span id="completion-rate">0%</span></p>
-      <p>Current Streak: <span id="current-streak">0 days</span></p>
-      <p>Longest Streak: <span id="longest-streak">0 days</span></p>
-      <p>Total Completed: <span id="total-completed">0</span></p>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Habit Tracker</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="manifest" href="manifest.json" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Habit Tracker</h1>
+      <form id="habit-form">
+        
+        <label for="habit-input">Enter a new habit:</label>
+        <input
+          type="text"
+          id="habit-input"
+          placeholder="Enter a new habit"
+          required
+        />
+
+        <label for="habit-date">Select date:</label>
+        <input type="date" id="habit-date" required />
+
+        <button type="submit">Add Habit</button>
+      </form>
+      <ul id="habit-list"></ul>
+      <div id="stats">
+        <h2>Stats</h2>
+        <p>Total Habits: <span id="total-habits">0</span></p>
+        <p>Completion Rate: <span id="completion-rate">0%</span></p>
+        <p>Current Streak: <span id="current-streak">0 days</span></p>
+        <p>Longest Streak: <span id="longest-streak">0 days</span></p>
+        <p>Total Completed: <span id="total-completed">0</span></p>
+      </div>
     </div>
-  </div>
-  <script src="script.js"></script>
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js', {
-        scope: '/HabitTracker/'
-      })
-      .then(reg => console.log('Service Worker Registered'))
-      .catch(err => console.error('Service Worker Error:', err));
-    }
-  </script>
-</body>
+    <script src="script.js"></script>
+    <script>
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker
+          .register("service-worker.js", {
+            scope: "/HabitTracker/",
+          })
+          .then((reg) => console.log("Service Worker Registered"))
+          .catch((err) => console.error("Service Worker Error:", err));
+      }
+    </script>
+  </body>
 </html>
