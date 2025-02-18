@@ -5,13 +5,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const totalHabits = document.getElementById('total-habits');
   const completionRate = document.getElementById('completion-rate');
 
+  // Load habits from localStorage or initialize an empty array
   let habits = JSON.parse(localStorage.getItem('habits')) || [];
 
+  // Render the list of habits
   function renderHabits() {
-    habitList.innerHTML = '';
+    habitList.innerHTML = ''; // Clear the current list
     habits.forEach((habit, index) => {
       const habitItem = document.createElement('li');
       habitItem.className = 'habit-item';
+      // Add a checkbox to mark habits as completed
       habitItem.innerHTML = `
         <span>${habit.name}</span>
         <input type="checkbox" ${habit.completed ? 'checked' : ''} onchange="toggleCompletion(${index})">
@@ -19,40 +22,67 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
       habitList.appendChild(habitItem);
     });
-    updateStats();
+    updateStats(); // Update the stats after rendering
   }
 
+  // Add a new habit
   function addHabit(event) {
-    event.preventDefault();
-    const habitName = habitInput.value.trim();
+    event.preventDefault(); // Prevent form submission
+    const habitName = habitInput.value.trim(); // Get the habit name
     if (habitName) {
+      // Add the new habit with a history array to track completions
       habits.push({ name: habitName, completed: false, history: [] });
-      habitInput.value = '';
-      localStorage.setItem('habits', JSON.stringify(habits));
-      renderHabits();
+      habitInput.value = ''; // Clear the input field
+      localStorage.setItem('habits', JSON.stringify(habits)); // Save to localStorage
+      renderHabits(); // Re-render the list
     }
   }
 
+  // Toggle the completion status of a habit
   function toggleCompletion(index) {
-    habits[index].completed = !habits[index].completed;
-    habits[index].history.push({ date: new Date().toISOString().split('T')[0], completed: habits[index].completed });
+    const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+    const habit = habits[index];
+
+    // Toggle the completion status
+    habit.completed = !habit.completed;
+
+    // Add today's completion status to the habit's history
+    habit.history.push({ date: today, completed: habit.completed });
+
+    // Save the updated habits to localStorage
     localStorage.setItem('habits', JSON.stringify(habits));
+
+    // Re-render the list and update stats
     renderHabits();
   }
 
+  // Delete a habit
   function deleteHabit(index) {
-    habits.splice(index, 1);
-    localStorage.setItem('habits', JSON.stringify(habits));
-    renderHabits();
+    habits.splice(index, 1); // Remove the habit from the array
+    localStorage.setItem('habits', JSON.stringify(habits)); // Save to localStorage
+    renderHabits(); // Re-render the list
   }
 
+  // Update the stats (total habits and completion rate)
   function updateStats() {
+    const today = new Date().toISOString().split('T')[0]; // Get today's date
+
+    // Calculate the number of habits completed today
+    const completedToday = habits.filter(habit => 
+      habit.history.some(entry => entry.date === today && entry.completed)
+    ).length;
+
+    // Update the total number of habits
     totalHabits.textContent = habits.length;
-    const completedHabits = habits.filter(habit => habit.completed).length;
-    const rate = habits.length > 0 ? ((completedHabits / habits.length) * 100).toFixed(2) : 0;
+
+    // Calculate the completion rate for today
+    const rate = habits.length > 0 ? ((completedToday / habits.length) * 100).toFixed(2) : 0;
     completionRate.textContent = `${rate}%`;
   }
 
+  // Add an event listener to the form for adding habits
   habitForm.addEventListener('submit', addHabit);
+
+  // Render the initial list of habits
   renderHabits();
 });
