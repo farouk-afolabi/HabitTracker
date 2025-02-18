@@ -17,8 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
       // Add a checkbox to mark habits as completed
       habitItem.innerHTML = `
         <span>${habit.name}</span>
-        <input type="checkbox" ${habit.completed ? 'checked' : ''} onchange="toggleCompletion(${index})">
-        <button onclick="deleteHabit(${index})">Delete</button>
+        <input type="checkbox" ${habit.completed ? 'checked' : ''} data-index="${index}" class="habit-checkbox">
+        <button data-index="${index}" class="delete-button">Delete</button>
       `;
       habitList.appendChild(habitItem);
     });
@@ -79,6 +79,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const rate = habits.length > 0 ? ((completedToday / habits.length) * 100).toFixed(2) : 0;
     completionRate.textContent = `${rate}%`;
   }
+
+  // Handle click events on the habit list (event delegation)
+  habitList.addEventListener('click', (event) => {
+    const target = event.target;
+
+    // Check if the delete button was clicked
+    if (target.classList.contains('delete-button')) {
+      const index = target.dataset.index; // Get the index from the data attribute
+      deleteHabit(index); // Call the deleteHabit function
+    }
+
+    // Check if the checkbox was clicked
+    if (target.classList.contains('habit-checkbox')) {
+      const index = target.dataset.index; // Get the index from the data attribute
+      toggleCompletion(index); // Call the toggleCompletion function
+    }
+  });
 
   // Add an event listener to the form for adding habits
   habitForm.addEventListener('submit', addHabit);
