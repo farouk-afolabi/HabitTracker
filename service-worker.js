@@ -4,9 +4,8 @@ const FILES_TO_CACHE = [
   "/HabitTracker /index.html",
   "/HabitTracker /style.css",
   "/HabitTracker /script.js",
-  "/HabitTracker /manifest.json",
-  "/HabitTracker /icons/icon-128.png",
-  "/HabitTracker /icons/icon-512.png",
+  "/HabitTracker /manifest.json"
+  
 ];
 self.addEventListener("install", (event) => {
   event.waitUntil(
