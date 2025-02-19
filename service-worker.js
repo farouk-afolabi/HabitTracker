@@ -3,7 +3,7 @@ const FILES_TO_CACHE = [
   "/HabitTracker/",
   "/HabitTracker /index.html",
   "/HabitTracker /style.css",
-  "/HabitTracker /script.js",
+  "/HabitTracker /app.js",
   "/HabitTracker /manifest.json"
   
 ];
