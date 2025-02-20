@@ -1,3 +1,29 @@
+//Initializing Firebase 
+import { initializeApp } from 'firebase/app';
+import { getAnalytics } from "firebase/analytics";
+import { doc, getDocs, addDoc, updateDoc, getFirestore, collection } from
+"firebase/firestore";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDcGAwDHCHCOaU73kCYg1dkGCZ9C3XvQng",
+  authDomain: "habittracker-f3cf9.firebaseapp.com",
+  projectId: "habittracker-f3cf9",
+  storageBucket: "habittracker-f3cf9.firebasestorage.app",
+  messagingSenderId: "128819965244",
+  appId: "1:128819965244:web:de90745c1aef155c73c239",
+  measurementId: "G-8WNP6BBD6P"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const analytics = getAnalytics(app);
+
+
+
+
+
+
 document.addEventListener('DOMContentLoaded', () => {
   const habitForm = document.getElementById('habit-form');
   const habitInput = document.getElementById('habit-input');
