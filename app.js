@@ -121,3 +121,8 @@ document.addEventListener('DOMContentLoaded', () => {
   habitForm.addEventListener('submit', addHabit);
   renderHabits();
 });
+
+//Error Logging 
+window.addEventListener('error', function (event) {
+  console.error('Error occurred: ', event.message);
+ });
