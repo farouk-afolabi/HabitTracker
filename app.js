@@ -1,6 +1,5 @@
 //Initializing Firebase 
 import { initializeApp } from 'firebase/app';
-import { getAnalytics } from "firebase/analytics";
 import { getFirestore, doc, getDocs, addDoc, updateDoc, collection, deleteDoc } from
 "firebase/firestore";
 
@@ -24,7 +23,7 @@ const db = getFirestore(app);
 
 
 
-document.addEventListener("DOMContentLoaded", () => {
+
   const habitForm = document.getElementById("habit-form");
   const habitInput = document.getElementById("habit-input");
   const habitList = document.getElementById("habit-list");
@@ -197,7 +196,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   renderHabits();
-});
+
 
 //Adding security & validation
 function sanitizeInput(input) {
