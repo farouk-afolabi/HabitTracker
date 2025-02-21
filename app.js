@@ -3,6 +3,17 @@ import { initializeApp } from 'firebase/app';
 import { getFirestore, doc, getDocs, addDoc, updateDoc, collection, deleteDoc } from
 "firebase/firestore";
 
+
+//Adding logging to my code 
+import log from "loglevel";
+
+// Set the log level (trace, debug, info, warn, error)
+log.setLevel("info");
+// Example logs
+log.info("Application started");
+log.debug("Debugging information");
+log.error("An error occurred");
+
 const firebaseConfig = {
   apiKey: "AIzaSyDcGAwDHCHCOaU73kCYg1dkGCZ9C3XvQng",
   authDomain: "habittracker-f3cf9.firebaseapp.com",
@@ -80,6 +91,8 @@ const db = getFirestore(app);
       });
       renderHabits(); // Refresh the list
     } catch (error) {
+      // Log error
+      log.error("Error adding task", error);
       console.error("Error adding habit: ", error);
     }
   }
