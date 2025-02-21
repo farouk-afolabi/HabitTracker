@@ -33,3 +33,10 @@ jobs:
 
       - name: Run linting
         run: npm run lint
+
+      - name: Upload logs
+        run: |
+          mkdir logs
+          echo "Logs uploaded on $(date)" > logs/summary.log
+          tar -czf logs.tar.gz logs
+        continue-on-error: true
