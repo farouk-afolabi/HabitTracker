@@ -20,10 +20,15 @@ body {
     margin: 20px; /* Add margin for smaller screens */
   }
   
+  
   h1 {
     margin-bottom: 20px;
     font-size: 24px;
   }
+
+  label {
+    display: block;
+}
   
   #habit-form {
     display: flex;

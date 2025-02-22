@@ -19,28 +19,33 @@
 </script>
 
   <body>
+    <header>
+      <h1>Habit Tracker</h1>
+    </header>
+
     <main>
     <div class="container">
-      <h1>Habit Tracker</h1>
       <form id="habit-form">
 
         <label for="habit-date">Select date:</label>
-        <input type="date" id="habit-date" required />
+        <input type="date" id="habit-date" name="habit-date" required />
         
         <label for="habit-input">Enter a new habit:</label>
         <input
           type="text"
           id="habit-input"
+          name="habit-name"
           placeholder="Enter a new habit"
           required
         />
 
         
 
-        <button type="submit">Add Habit</button>
+        <button type="submit" id="addHabit" >Add Habit</button>
+        <ul id="habitList"></ul>
       </form>
       
-      <ul id="habit-list"></ul>
+      
       <div id="stats">
         <h2>Stats</h2>
         <p>Total Habits: <span id="total-habits">0</span></p>

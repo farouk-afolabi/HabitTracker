@@ -1,19 +1,10 @@
-//Initializing Firebase 
+// Import Firebase modules
 import { initializeApp } from 'firebase/app';
-import { getFirestore, doc, getDocs, addDoc, updateDoc, collection, deleteDoc } from
-"firebase/firestore";
+import { getFirestore, collection, addDoc, getDocs } from 'firebase/firestore';
+// Import loglevel
+import log from 'loglevel';
 
-
-//Adding logging to my code 
-import log from "loglevel";
-
-// Set the log level (trace, debug, info, warn, error)
-log.setLevel("info");
-// Example logs
-log.info("Application started");
-log.debug("Debugging information");
-log.error("An error occurred");
-
+// Initialize Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyDcGAwDHCHCOaU73kCYg1dkGCZ9C3XvQng",
   authDomain: "habittracker-f3cf9.firebaseapp.com",
@@ -24,209 +15,139 @@ const firebaseConfig = {
   measurementId: "G-8WNP6BBD6P"
 };
 
-// Initialize Firebase
+// Initialize Firebase app
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 
+// DOM elements
+const habitForm = document.getElementById("habit-form");
+const habitInput = document.getElementById("habit-input");
+const habitDate = document.getElementById('habit-date');
+const habitList = document.getElementById("habitList");
+const totalHabits = document.getElementById("total-habits");
+const completionRate = document.getElementById("completion-rate");
 
-
-
-
-
-
-  const habitForm = document.getElementById("habit-form");
-  const habitInput = document.getElementById("habit-input");
-  const habitList = document.getElementById("habit-list");
-  const totalHabits = document.getElementById("total-habits");
-  const completionRate = document.getElementById("completion-rate");
-
-
-  let habitCache = [];
-  // Fetch habits from Firestore
-  async function getHabitsFromFirestore() {
-    if (habitCache.length > 0) return habitCache; // Return cache if available
-    
-    try {
-      const data = await getDocs(collection(db, "habits"));
-      habitCache = data.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-    return habitCache;
+// Form submission handler
+habitForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const habit = habitInput.value.trim();
+  const date = habitDate.value;
+  
+  if (!habit || !date) {
+      alert("Please enter both habit and date!");
+      return;
+  }
+  
+  try {
+      const habitName = sanitizeInput(habit);
+      if (!habitName) {
+          throw new Error("Invalid habit name");
+      }
+      await addHabitToFirestore(habitName, date);
+      renderHabits();
+      habitInput.value = "";
+      habitDate.value = "";
   } catch (error) {
-    console.error("Error fetching habits:", error);
-    return [];
+      console.error("Error details:", error);
+      alert(`Failed to add habit: ${error.message || "Unknown error"}`);
+  }
+});
+
+// Add Habit when Enter Key is Pressed in Input Field
+habitInput.addEventListener("keypress", function(event) {
+    if (event.key === "Enter") {
+        habitForm.requestSubmit();
+    }
+});
+
+// Add habit to Firestore
+async function addHabitToFirestore(habitName, habitDate) {
+  try {
+      const docRef = await addDoc(collection(db, "habits"), {
+          name: habitName,
+          completed: false,
+          history: [{
+              date: habitDate,
+              completed: false
+          }]
+      });
+      log.info(`Successfully added habit: ${habitName}`);
+      return docRef.id;
+  } catch (error) {
+      log.error("Firestore error:", error);
+      if (error.code) {
+          throw new Error(`Firestore error: ${error.code}`);
+      }
+      throw error;
   }
 }
 
-  // Render the list of habits
-  async function renderHabits() {
-    habitList.innerHTML = ""; // Clear the current list
-    const habits = await getHabitsFromFirestore();
-
-    habits.forEach((habit) => {
-      const habitItem = document.createElement("li");
-      habitItem.className = "habit-item";
-      habitItem.id = habit.id;
-
-      // Add a checkbox to mark habits as completed
-      habitItem.innerHTML = `
-        <span class="habit-name">${habit.name}</span>
-        <input type="checkbox" ${habit.completed ? "checked" : ""} data-id="${habit.id}" class="habit-checkbox">
-        <button data-id="${habit.id}" class="edit-button">Edit</button>
-        <button data-id="${habit.id}" class="delete-button">Delete</button>
-      `;
-
-      habitList.appendChild(habitItem);
-    });
-
-    updateStats(); // Update the stats after rendering
-  }
-
-  // Add a new habit to Firestore
-  async function addHabitToFirestore(habitName) {
-    try {
-      await addDoc(collection(db, "habits"), {
-        name: habitName,
-        completed: false,
-        history: [],
-      });
-      renderHabits(); // Refresh the list
-    } catch (error) {
-      // Log error
-      log.error("Error adding task", error);
-      console.error("Error adding habit: ", error);
-    }
-  }
-
-  // Event listener for adding a habit
-  habitForm.addEventListener("submit", async (event) => {
-    event.preventDefault(); // Prevent form submission
-    const habitName = habitInput.value.trim();
-
-    if (habitName) {
-      await addHabitToFirestore(habitName);
-      habitInput.value = ""; // Clear the input field
-    }
-  });
-
-  // Edit a habit
-  function editHabit(habitId, currentName) {
-    const habitItem = document.getElementById(habitId);
-    const habitNameSpan = habitItem.querySelector(".habit-name");
-  
-    const inputElement = document.createElement("input");
-    inputElement.type = "text";
-    inputElement.value = currentName;
-    inputElement.className = "edit-input";
-  
-    const saveButton = document.createElement("button");
-    saveButton.textContent = "Save";
-    saveButton.className = "save-button";
-    saveButton.dataset.id = habitId;
-  
-    habitNameSpan.innerHTML = ""; // Clear the text before appending elements
-    habitNameSpan.appendChild(inputElement);
-    habitNameSpan.appendChild(saveButton);
-  }
-  
-
-  // Save the edited habit to Firestore
-  async function saveHabit(habitId) {
-    const habitItem = document.getElementById(habitId);
-    const editInput = habitItem.querySelector(".edit-input");
-
-    if (editInput) {
-      const newName = editInput.value.trim();
-      try {
-        await updateDoc(doc(db, "habits", habitId), { name: newName });
-        renderHabits(); // Refresh the list
-      } catch (error) {
-        console.error("Error updating habit:", error);
+async function getHabitsFromFirestore() {
+  try {
+      const data = await getDocs(collection(db, "habits"));
+      return data.docs;
+  } catch (error) {
+      log.error("Error fetching habits:", error);
+      if (error.code === 'permission-denied') {
+          throw new Error("Permission denied. Check your Firebase rules.");
       }
-    }
+      throw error;
   }
+}
 
-  // Toggle the completion status of a habit
-  async function toggleCompletion(habitId, currentStatus) {
-    const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
-
+// Retrieving the list of habits
+async function renderHabits() {
     try {
-      const habitDoc = doc(db, "habits", habitId);
-      await updateDoc(habitDoc, {
-        completed: !currentStatus,
-        history: [{ date: today, completed: !currentStatus }],
-      });
-      renderHabits();
+        const habits = await getHabitsFromFirestore();
+        habitList.innerHTML = "";
+        
+        habits.forEach((habit) => {
+            if (!habit.data().completed) {
+                const habitItem = document.createElement("li");
+                habitItem.className = "habit-item";
+                habitItem.id = habit.id;
+                habitItem.textContent = habit.data().name;
+                habitItem.tabIndex = 0;
+                habitList.appendChild(habitItem);
+            }
+        });
+        
+        // Update stats
+        totalHabits.textContent = habits.length;
+        const activeHabits = habits.filter(h => !h.data().completed).length;
+        const completionRateValue = habits.length > 0 
+            ? ((habits.length - activeHabits) / habits.length * 100).toFixed(2)
+            : 0;
+        completionRate.textContent = `${completionRateValue}%`;
     } catch (error) {
-      console.error("Error updating habit completion:", error);
+        console.error("Error rendering habits:", error);
     }
-  }
+}
 
-  // Delete a habit from Firestore
-  async function deleteHabit(habitId) {
+// Fetch habits from Firestore
+async function getHabitsFromFirestore() {
     try {
-      await deleteDoc(doc(db, "habits", habitId));
-      renderHabits(); // Refresh the list
+        const data = await getDocs(collection(db, "habits"));
+        return data.docs;
     } catch (error) {
-      console.error("Error deleting habit:", error);
+        console.error("Error fetching habits:", error);
+        throw error;
     }
-  }
+}
 
-  // Update the stats (total habits and completion rate)
-  async function updateStats() {
-    const habits = await getHabitsFromFirestore();
-    const today = new Date().toISOString().split("T")[0];
-
-    const completedToday = habits.filter((habit) =>
-      habit.history?.some((entry) => entry.date === today && entry.completed)
-    ).length;
-
-    totalHabits.textContent = habits.length;
-    const rate = habits.length > 0 ? ((completedToday / habits.length) * 100).toFixed(2) : 0;
-    completionRate.textContent = `${rate}%`;
-  }
-
-  // Handle click events on the habit list (event delegation)
-  habitList.addEventListener("click", async (event) => {
-    const target = event.target;
-    const habitId = target.dataset.id;
-
-    if (target.classList.contains("delete-button")) {
-      await deleteHabit(habitId);
-    }
-
-    if (target.classList.contains("habit-checkbox")) {
-      await toggleCompletion(habitId, target.checked);
-    }
-
-    if (target.classList.contains("edit-button")) {
-      const habitName = target.parentElement.querySelector(".habit-name").textContent;
-      editHabit(habitId, habitName);
-    }
-
-    if (target.classList.contains("save-button")) {
-      await saveHabit(habitId);
-    }
-  });
-
-  renderHabits();
-
-
-//Adding security & validation
+ 
 function sanitizeInput(input) {
   const div = document.createElement("div");
   div.textContent = input;
   return div.innerHTML;
 }
 
-habitForm.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  const habitName = sanitizeInput(habitInput.value.trim());
+ 
 
-  if (habitName) {
-    await addHabitToFirestore(habitName);
-    habitInput.value = ""; 
-  }
-});
+
+
+
 
 
 
@@ -247,3 +168,11 @@ if ('serviceWorker' in navigator) {
 'with', import.meta.url))
  .catch(err => console.error('Service Worker Error:', err));
 }
+
+
+// Set the log level (trace, debug, info, warn, error)
+log.setLevel("info");
+// Example logs
+log.info("Application started");
+log.debug("Debugging information");
+log.error("An error occurred");
