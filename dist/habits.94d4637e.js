@@ -662,18 +662,6 @@ async function addHabitToFirestore(habitName, habitDate, email) {
         throw error;
     }
 }
-// Get habits from Firestore that match the user's email
-async function getHabitsFromFirestore(email) {
-    try {
-        const q = (0, _firestore.query)((0, _firestore.collection)((0, _firebase.db), "habits"), (0, _firestore.where)("email", "==", email));
-        const data = await (0, _firestore.getDocs)(q);
-        return data.docs;
-    } catch (error) {
-        (0, _loglevelDefault.default).error("Error fetching habits:", error);
-        if (error.code === "permission-denied") throw new Error("Permission denied. Check your Firebase rules.");
-        throw error;
-    }
-}
 // Retrieving the list of habits
 async function renderHabits() {
     try {
@@ -730,10 +718,18 @@ async function renderHabits() {
         throw error;
     }
 }
+// render habits on page load for the user
+window.addEventListener("load", renderHabits);
 // Fetch habits from Firestore
 async function getHabitsFromFirestore() {
     try {
-        const data = await (0, _firestore.getDocs)((0, _firestore.collection)((0, _firebase.db), "habits"));
+        const userEmail = JSON.parse(localStorage.getItem("email"));
+        if (!userEmail) {
+            console.error("No email found in local storage.");
+            return [];
+        }
+        const q = (0, _firestore.query)((0, _firestore.collection)((0, _firebase.db), "habits"), (0, _firestore.where)("email", "==", userEmail));
+        const data = await (0, _firestore.getDocs)(q);
         return data.docs;
     } catch (error) {
         console.error("Error fetching habits:", error);
@@ -782,7 +778,7 @@ async function editHabit(habitId, newName) {
 async function deleteHabit(habitId) {
     try {
         const habitRef = (0, _firestore.doc)((0, _firebase.db), "habits", habitId);
-        await deleteDoc(habitRef);
+        await (0, _firestore.deleteDoc)(habitRef);
         (0, _loglevelDefault.default).info(`Habit ${habitId} deleted`);
         renderHabits();
     } catch (error) {
@@ -819,13 +815,12 @@ async function getApiKey() {
             return null;
         }
         let data = snapshot.data();
-        console.log("\uD83D\uDCCC Retrieved document data:", data);
         let apiKey = data.key;
         if (!apiKey) {
             console.error("\u26A0\uFE0F API key is missing in Firestore document!");
             return null;
         }
-        console.log("\u2705 API Key retrieved successfully:", apiKey);
+        console.log("\u2705 API Key retrieved successfully:");
         return apiKey; // Return the API key instead of initializing the model here
     } catch (error) {
         console.error("\uD83D\uDD25 Error fetching API key:", error);
@@ -898,31 +893,66 @@ document.addEventListener("DOMContentLoaded", async ()=>{
             let habitName = request.replace("add habit", "").trim();
             if (habitName) try {
                 let habitDate = new Date().toISOString().split("T")[0]; // Today's date
-                let habitId = await addHabitToFirestore(habitName, habitDate);
-                appendMessage(`\u{2705} Habit "${habitName}" added with ID: ${habitId}`);
+                const email = JSON.parse(localStorage.getItem("email"));
+                if (!email) {
+                    appendMessage("\u26A0\uFE0F No email found. Please log in again.");
+                    return;
+                }
+                let habitId = await addHabitToFirestore(habitName, habitDate, email);
+                appendMessage(`Habit "${habitName}" successfully added `);
+                // Refresh the habits list instantly
+                renderHabits();
             } catch (error) {
                 appendMessage(`\u{26A0}\u{FE0F} Error adding habit: ${error.message}`);
             }
             else appendMessage("\u26A0\uFE0F Please specify a habit to add.");
             return true;
+        } else if (request.startsWith("delete habit")) {
+            let habitName = request.replace("delete habit", "").trim();
+            if (habitName) removeFromHabitName(habitName).then((success)=>{
+                if (success) appendMessage(`\u{1F3AF} Habit "${habitName}" has been successfully deleted.`);
+                else appendMessage("\u26A0\uFE0F Habit not found!");
+            });
+            else appendMessage("\u26A0\uFE0F Please specify a habit to complete.");
+            return true;
         } else if (request.startsWith("complete habit")) {
             let habitName = request.replace("complete habit", "").trim();
-            if (habitName) {
-                if (removeFromHabitName(habitName)) appendMessage(`\u{1F3AF} Habit "${habitName}" marked as complete.`);
+            if (habitName) toggleHabitByName(habitName).then((success)=>{
+                if (success) appendMessage(`\u{1F3AF} Habit "${habitName}" completion toggled.`);
                 else appendMessage("\u26A0\uFE0F Habit not found!");
-            } else appendMessage("\u26A0\uFE0F Please specify a habit to complete.");
+            });
+            else appendMessage("\u26A0\uFE0F Please specify a habit to complete.");
             return true;
         }
         return false;
     }
-    function removeFromHabitName(habit) {
-        let ele = document.getElementsByName(habit);
-        if (ele.length === 0) return false;
-        ele.forEach((e)=>{
-            removeHabit(e.id);
-            removeVisualHabit(e.id);
-        });
-        return true;
+    async function removeFromHabitName(habitName) {
+        try {
+            const habits = await getHabitsFromFirestore(); // Fetch habits from Firestore
+            const habitsToRemove = habits.filter((h)=>h.data().name.toLowerCase() === habitName.toLowerCase());
+            if (habitsToRemove.length === 0) return false; // Habit not found
+            for (const habit of habitsToRemove)await deleteHabit(habit.id); // Delete from Firestore
+            renderHabits(); // Refresh the UI instantly
+            return true;
+        } catch (error) {
+            console.error("Error removing habit:", error);
+            return false;
+        }
+    }
+    async function toggleHabitByName(habitName) {
+        try {
+            const habits = await getHabitsFromFirestore();
+            const habitToToggle = habits.find((h)=>h.data().name.toLowerCase() === habitName.toLowerCase());
+            if (!habitToToggle) return false; // Habit not found
+            const habitId = habitToToggle.id;
+            const currentStatus = habitToToggle.data().completed;
+            // Call the existing toggle function
+            await toggleHabitCompletion(habitId, currentStatus);
+            return true;
+        } catch (error) {
+            console.error("Error toggling habit:", error);
+            return false;
+        }
     }
 });
 signOutBttn.addEventListener("click", function(event) {
