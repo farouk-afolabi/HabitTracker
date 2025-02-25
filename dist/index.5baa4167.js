@@ -685,22 +685,54 @@ async function renderHabits() {
         const habits = await getHabitsFromFirestore();
         habitList.innerHTML = "";
         habits.forEach((habit)=>{
-            if (!habit.data().completed) {
-                const habitItem = document.createElement("li");
-                habitItem.className = "habit-item";
-                habitItem.id = habit.id;
-                habitItem.textContent = habit.data().name;
-                habitItem.tabIndex = 0;
-                habitList.appendChild(habitItem);
+            const habitData = habit.data();
+            const habitItem = document.createElement("li");
+            habitItem.className = "habit-item";
+            habitItem.id = habit.id;
+            habitItem.tabIndex = 0;
+            // Apply style if the habit is completed
+            if (habitData.completed) {
+                habitItem.style.textDecoration = "line-through"; // Strikethrough completed habits
+                habitItem.style.color = "red"; // Change color for completed habits
             }
+            // Habit name
+            const habitName = document.createElement("span");
+            habitName.textContent = habit.data().name;
+            habitItem.appendChild(habitName);
+            // Action buttons
+            const actions = document.createElement("div");
+            actions.className = "habit-actions";
+            // Toggle completion button
+            const toggleBtn = document.createElement("button");
+            toggleBtn.textContent = habitData.completed ? "\u274C" : "\u2713"; // Toggle icon;
+            toggleBtn.onclick = ()=>toggleHabitCompletion(habit.id, habit.data().completed);
+            actions.appendChild(toggleBtn);
+            // Edit button
+            const editBtn = document.createElement("button");
+            editBtn.textContent = "edit";
+            editBtn.onclick = ()=>{
+                const newName = prompt("Enter new habit name:", habit.data().name);
+                if (newName) editHabit(habit.id, newName);
+            };
+            actions.appendChild(editBtn);
+            // Delete button
+            const deleteBtn = document.createElement("button");
+            deleteBtn.textContent = "delete";
+            deleteBtn.onclick = async ()=>{
+                if (confirm("Are you sure you want to delete this habit?")) await deleteHabit(habit.id);
+            };
+            actions.appendChild(deleteBtn);
+            habitItem.appendChild(actions);
+            habitList.appendChild(habitItem);
         });
         // Update stats
         totalHabits.textContent = habits.length;
-        const activeHabits = habits.filter((h)=>!h.data().completed).length;
-        const completionRateValue = habits.length > 0 ? ((habits.length - activeHabits) / habits.length * 100).toFixed(2) : 0;
-        completionRate.textContent = `${completionRateValue}%`;
+        const completedHabits = habits.filter((h)=>h.data().completed).length;
+        const completionRateValue = habits.length > 0 ? (completedHabits / habits.length * 100).toFixed(2) : 0;
+        completionRate.textContent = `${completionRateValue}% completed`;
     } catch (error) {
-        console.error("Error rendering habits:", error);
+        (0, _loglevelDefault.default).error("Error rendering habits:", error);
+        throw error;
     }
 }
 // Fetch habits from Firestore
@@ -717,6 +749,51 @@ function sanitizeInput(input) {
     const div = document.createElement("div");
     div.textContent = input;
     return div.innerHTML;
+}
+// Toggle for habit completion
+async function toggleHabitCompletion(habitId, currentStatus) {
+    try {
+        const habitRef = (0, _firestore.doc)(db, "habits", habitId);
+        await (0, _firestore.updateDoc)(habitRef, {
+            completed: !currentStatus,
+            history: [
+                {
+                    date: new Date().toISOString().split('T')[0],
+                    completed: !currentStatus
+                }
+            ]
+        });
+        (0, _loglevelDefault.default).info(`Habit ${habitId} completion toggled`);
+        renderHabits();
+    } catch (error) {
+        (0, _loglevelDefault.default).error("Error toggling habit completion:", error);
+        throw error;
+    }
+}
+async function editHabit(habitId, newName) {
+    try {
+        const habitRef = (0, _firestore.doc)(db, "habits", habitId);
+        await (0, _firestore.updateDoc)(habitRef, {
+            name: newName,
+            lastModified: new Date()
+        });
+        (0, _loglevelDefault.default).info(`Habit ${habitId} updated to: ${newName}`);
+        renderHabits();
+    } catch (error) {
+        (0, _loglevelDefault.default).error("Error editing habit:", error);
+        throw error;
+    }
+}
+async function deleteHabit(habitId) {
+    try {
+        const habitRef = (0, _firestore.doc)(db, "habits", habitId);
+        await (0, _firestore.deleteDoc)(habitRef);
+        (0, _loglevelDefault.default).info(`Habit ${habitId} deleted`);
+        renderHabits();
+    } catch (error) {
+        (0, _loglevelDefault.default).error("Error deleting habit:", error);
+        throw error;
+    }
 }
 //Error Logging 
 window.addEventListener('error', function(event) {
@@ -737,45 +814,7 @@ if ('serviceWorker' in navigator) {
 (0, _loglevelDefault.default).debug("Debugging information");
 (0, _loglevelDefault.default).error("An error occurred");
 
-},{"a9f901fea61c26ef":"72bEf","firebase/app":"aM3Fo","firebase/firestore":"8A4BC","loglevel":"7kRFs","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"72bEf":[function(require,module,exports,__globalThis) {
-module.exports = require("9e9febe71fd0c8b8").getBundleURL('1G2bZ') + "service-worker.75769289.js" + "?" + Date.now();
-
-},{"9e9febe71fd0c8b8":"lgJ39"}],"lgJ39":[function(require,module,exports,__globalThis) {
-"use strict";
-var bundleURL = {};
-function getBundleURLCached(id) {
-    var value = bundleURL[id];
-    if (!value) {
-        value = getBundleURL();
-        bundleURL[id] = value;
-    }
-    return value;
-}
-function getBundleURL() {
-    try {
-        throw new Error();
-    } catch (err) {
-        var matches = ('' + err.stack).match(/(https?|file|ftp|(chrome|moz|safari-web)-extension):\/\/[^)\n]+/g);
-        if (matches) // The first two stack frames will be this function and getBundleURLCached.
-        // Use the 3rd one, which will be a runtime in the original bundle.
-        return getBaseURL(matches[2]);
-    }
-    return '/';
-}
-function getBaseURL(url) {
-    return ('' + url).replace(/^((?:https?|file|ftp|(chrome|moz|safari-web)-extension):\/\/.+)\/[^/]+$/, '$1') + '/';
-}
-// TODO: Replace uses with `new URL(url).origin` when ie11 is no longer supported.
-function getOrigin(url) {
-    var matches = ('' + url).match(/(https?|file|ftp|(chrome|moz|safari-web)-extension):\/\/[^/]+/);
-    if (!matches) throw new Error('Origin not found');
-    return matches[0];
-}
-exports.getBundleURL = getBundleURLCached;
-exports.getBaseURL = getBaseURL;
-exports.getOrigin = getOrigin;
-
-},{}],"aM3Fo":[function(require,module,exports,__globalThis) {
+},{"firebase/app":"aM3Fo","firebase/firestore":"8A4BC","loglevel":"7kRFs","a9f901fea61c26ef":"72bEf","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"aM3Fo":[function(require,module,exports,__globalThis) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var _app = require("@firebase/app");
@@ -29253,6 +29292,44 @@ var createWebChannelTransport;
     defaultLogger['default'] = defaultLogger;
     return defaultLogger;
 });
+
+},{}],"72bEf":[function(require,module,exports,__globalThis) {
+module.exports = require("9e9febe71fd0c8b8").getBundleURL('1G2bZ') + "service-worker.75769289.js" + "?" + Date.now();
+
+},{"9e9febe71fd0c8b8":"lgJ39"}],"lgJ39":[function(require,module,exports,__globalThis) {
+"use strict";
+var bundleURL = {};
+function getBundleURLCached(id) {
+    var value = bundleURL[id];
+    if (!value) {
+        value = getBundleURL();
+        bundleURL[id] = value;
+    }
+    return value;
+}
+function getBundleURL() {
+    try {
+        throw new Error();
+    } catch (err) {
+        var matches = ('' + err.stack).match(/(https?|file|ftp|(chrome|moz|safari-web)-extension):\/\/[^)\n]+/g);
+        if (matches) // The first two stack frames will be this function and getBundleURLCached.
+        // Use the 3rd one, which will be a runtime in the original bundle.
+        return getBaseURL(matches[2]);
+    }
+    return '/';
+}
+function getBaseURL(url) {
+    return ('' + url).replace(/^((?:https?|file|ftp|(chrome|moz|safari-web)-extension):\/\/.+)\/[^/]+$/, '$1') + '/';
+}
+// TODO: Replace uses with `new URL(url).origin` when ie11 is no longer supported.
+function getOrigin(url) {
+    var matches = ('' + url).match(/(https?|file|ftp|(chrome|moz|safari-web)-extension):\/\/[^/]+/);
+    if (!matches) throw new Error('Origin not found');
+    return matches[0];
+}
+exports.getBundleURL = getBundleURLCached;
+exports.getBaseURL = getBaseURL;
+exports.getOrigin = getOrigin;
 
 },{}]},["eCF1U","igcvL"], "igcvL", "parcelRequire94c2")
 
