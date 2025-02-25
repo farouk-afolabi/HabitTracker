@@ -375,7 +375,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
           appendMessage(`Habit "${habitName}" successfully added `);
           // Refresh the habits list instantly
-          renderHabits(); 
+          renderHabits();
         } catch (error) {
           appendMessage(`⚠️ Error adding habit: ${error.message}`);
         }
@@ -384,50 +384,54 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
       return true;
     } else if (request.startsWith("delete habit")) {
-        let habitName = request.replace("delete habit", "").trim();
-        if (habitName) {
-          removeFromHabitName(habitName).then((success) => {
-            if (success) {
-              appendMessage(`🎯 Habit "${habitName}" has been successfully deleted.`);
-            } else {
-              appendMessage("⚠️ Habit not found!");
-            }
-          });
-        } else {
-          appendMessage("⚠️ Please specify a habit to complete.");
-        }
-        return true;
-      } else if (request.startsWith("complete habit")) {
-        let habitName = request.replace("complete habit", "").trim();
-        if (habitName) {
-          toggleHabitByName(habitName).then((success) => {
-            if (success) {
-              appendMessage(`🎯 Habit "${habitName}" completion toggled.`);
-            } else {
-              appendMessage("⚠️ Habit not found!");
-            }
-          });
-        } else {
-          appendMessage("⚠️ Please specify a habit to complete.");
-        }
-        return true;
+      let habitName = request.replace("delete habit", "").trim();
+      if (habitName) {
+        removeFromHabitName(habitName).then((success) => {
+          if (success) {
+            appendMessage(
+              `🎯 Habit "${habitName}" has been successfully deleted.`
+            );
+          } else {
+            appendMessage("⚠️ Habit not found!");
+          }
+        });
+      } else {
+        appendMessage("⚠️ Please specify a habit to complete.");
       }
+      return true;
+    } else if (request.startsWith("complete habit")) {
+      let habitName = request.replace("complete habit", "").trim();
+      if (habitName) {
+        toggleHabitByName(habitName).then((success) => {
+          if (success) {
+            appendMessage(`🎯 Habit "${habitName}" completion toggled.`);
+          } else {
+            appendMessage("⚠️ Habit not found!");
+          }
+        });
+      } else {
+        appendMessage("⚠️ Please specify a habit to complete.");
+      }
+      return true;
+    }
     return false;
   }
 
   async function removeFromHabitName(habitName) {
     try {
       const habits = await getHabitsFromFirestore(); // Fetch habits from Firestore
-      const habitsToRemove = habits.filter(h => h.data().name.toLowerCase() === habitName.toLowerCase());
-  
+      const habitsToRemove = habits.filter(
+        (h) => h.data().name.toLowerCase() === habitName.toLowerCase()
+      );
+
       if (habitsToRemove.length === 0) {
         return false; // Habit not found
       }
-  
+
       for (const habit of habitsToRemove) {
         await deleteHabit(habit.id); // Delete from Firestore
       }
-  
+
       renderHabits(); // Refresh the UI instantly
       return true;
     } catch (error) {
@@ -439,28 +443,27 @@ document.addEventListener("DOMContentLoaded", async () => {
   async function toggleHabitByName(habitName) {
     try {
       const habits = await getHabitsFromFirestore();
-      const habitToToggle = habits.find(h => h.data().name.toLowerCase() === habitName.toLowerCase());
-  
+      const habitToToggle = habits.find(
+        (h) => h.data().name.toLowerCase() === habitName.toLowerCase()
+      );
+
       if (!habitToToggle) {
         return false; // Habit not found
       }
-  
+
       const habitId = habitToToggle.id;
       const currentStatus = habitToToggle.data().completed;
-  
+
       // Call the existing toggle function
       await toggleHabitCompletion(habitId, currentStatus);
-  
+
       return true;
     } catch (error) {
       console.error("Error toggling habit:", error);
       return false;
     }
   }
-  
 });
-
-
 
 signOutBttn.addEventListener("click", function (event) {
   localStorage.removeItem("email");

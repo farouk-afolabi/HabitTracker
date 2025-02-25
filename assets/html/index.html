@@ -4,26 +4,31 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Habit Tracker</title>
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/style.css" />
     <link rel="manifest" href="../../manifest.json" />
   </head>
 
   <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-R9WW4MS27S"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+  <script
+    async
+    src="https://www.googletagmanager.com/gtag/js?id=G-R9WW4MS27S"
+  ></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag("js", new Date());
 
-  gtag('config', 'G-R9WW4MS27S');
-</script>
-<body>
+    gtag("config", "G-R9WW4MS27S");
+  </script>
+  <body>
     <header>
-        <h1>Habit Tracker</h1>
+      <h1>Habit Tracker</h1>
     </header>
     <main>
-       <button id="signIn">Sign In</button>
+      <button id="signIn">Sign In</button>
     </main>
     <script type="module" src="../js/signIn.js"></script>
-</body>
+  </body>
 </html>

@@ -1,9 +1,13 @@
 const CACHE_NAME = "habit-tracker-pwa-cache-v1";
 const FILES_TO_CACHE = [
   "/HabitTracker/",
-  "/HabitTracker/index.html",
+  "/HabitTracker/assets/html/index.html",
+  "/HabitTracker/assets/html/habits.html",
+  "/HabitTracker/assets/css/style.css",
+  "/HabitTracker/assets/js/firebase.js",
   "/HabitTracker/style.css",
-  "/HabitTracker/app.js",
+  "/HabitTracker/assets/js/habits.js",
+  "/HabitTracker/assets/js/signIn.js",
   "/HabitTracker/manifest.json",
 ];
 self.addEventListener("install", (event) => {
