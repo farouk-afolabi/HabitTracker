@@ -1,0 +1,72 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Habit Tracker</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="manifest" href="../../manifest.json" />
+  </head>
+
+  <!-- Google tag (gtag.js) -->
+  <script
+    async
+    src="https://www.googletagmanager.com/gtag/js?id=G-R9WW4MS27S"
+  ></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag("js", new Date());
+
+    gtag("config", "G-R9WW4MS27S");
+  </script>
+
+  <body>
+    <header>
+      <h1>Habit Tracker</h1>
+    </header>
+
+    <main>
+      <div>
+        <button id="signOutBttn">Sign Out</button>
+      </div>
+      <div class="container">
+        <form id="habit-form">
+          <label for="habit-date">Select date:</label>
+          <input type="date" id="habit-date" name="habit-date" required />
+
+          <label for="habit-input">Enter a new habit:</label>
+          <input
+            type="text"
+            id="habit-input"
+            name="habit-name"
+            placeholder="Enter a new habit"
+            required
+          />
+
+          <button type="submit" id="addHabit">Add Habit</button>
+          <ul id="habitList"></ul>
+        </form>
+
+        <div id="stats">
+          <h2>Stats</h2>
+          <p>Total Habits: <span id="total-habits">0</span></p>
+          <p>Completion Rate: <span id="completion-rate">0%</span></p>
+        </div>
+      </div>
+
+      <!-- Add a Chat UI to the Habit-Tracker App -->
+      <div id="chatbot-container">
+        <div id="chat-header">AI Assistant</div>
+        <div id="chat-history"></div>
+        <input type="text" id="chat-input" />
+        <button id="send-btn">Send</button>
+      </div>
+    </main>
+    <script type="module" src="../js/habits.js"></script>
+   
+  </body>
+</html>

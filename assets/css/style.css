@@ -1,0 +1,214 @@
+
+
+header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+
+  }
+  
+  .container {
+    background: grey;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px; /* Limit width for larger screens */
+    text-align: center;
+    margin: 20px auto; /* Add margin for smaller screens */
+  }
+  
+  
+  h1 {
+    margin-bottom: 20px;
+    font-size: 24px;
+  }
+
+  label {
+    display: block;
+}
+  
+  #habit-form {
+    display: flex;
+    flex-direction: column; /* Stack form elements vertically on small screens */
+    margin-bottom: 20px;
+  }
+  
+  #habit-input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 10px; /* Add space between input and button */
+  }
+  
+  button {
+    padding: 10px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    background: #218838;
+  }
+  
+  #habit-list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .habit-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+  }
+  
+  .habit-item:last-child {
+    border-bottom: none;
+  }
+  
+  .habit-item button {
+    background: #18c658;
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .habit-item button:hover {
+    background: #18c985;
+  }
+
+  .habit-actions {
+    display: flex;
+    gap: 5px;
+    margin-left: 10px;
+}
+
+.habit-actions button {
+    padding: 2px 6px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.habit-actions button:hover {
+    background-color: #f0f0f0;
+}
+  
+  #stats {
+    margin-top: 20px;
+  }
+  
+  /* Media Queries for Responsiveness */
+  @media (max-width: 600px) {
+    .container {
+      margin: 10px;
+      padding: 15px;
+    }
+  
+    h1 {
+      font-size: 20px;
+    }
+  
+    #habit-form {
+      flex-direction: column;
+    }
+  
+    #habit-input {
+      margin-bottom: 10px;
+    }
+  
+    button {
+      width: 100%;
+    }
+  
+    .habit-item {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  
+    .habit-item button {
+      margin-top: 10px;
+      width: 100%;
+    }
+
+    /* Chatbot style*/
+    #chatbot-container {
+      width: 320px;
+      border: 2px solid #004d00;
+      padding: 15px;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: linear-gradient(135deg, #28a745, #006400);
+      box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      font-family: Arial, sans-serif;
+      color: white;
+  }
+
+  #chat-header {
+    background: #28a745;
+    padding: 10px;
+    text-align: center;
+    font-weight: bold;
+}
+  
+  /* Chat History */
+  #chat-history {
+      height: 250px;
+      overflow-y: auto;
+      border-bottom: 2px solid #ccc;
+      margin-bottom: 10px;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 5px;
+  }
+  
+  /* Chat Input */
+  #chat-input {
+      width: calc(100% - 80px);
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 14px;
+      background: white;
+  }
+  
+  /* Send Button */
+  #send-btn {
+      padding: 8px 15px;
+      cursor: pointer;
+      background: #ffcc00;
+      color: #000;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      transition: 0.3s ease-in-out;
+  }
+  
+  /* Send Button Hover */
+  #send-btn:hover {
+      background: #ff9900;
+      transform: scale(1.1);
+  }
+  
+  /* Message Styling */
+  .history {
+      padding-bottom: 15px;
+  }
+  }
