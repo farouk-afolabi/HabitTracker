@@ -1,8 +1,10 @@
 // Import Firebase modules
 import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, getDocs, getDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 // Import loglevel
 import log from 'loglevel';
+//Make an API Call to the Chatbot Service
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Initialize Firebase
 const firebaseConfig = {
@@ -267,3 +269,144 @@ log.setLevel("info");
 log.info("Application started");
 log.debug("Debugging information");
 log.error("An error occurred");
+
+
+
+
+// Function to fetch API key from Firestore
+async function getApiKey() {
+    try {
+        console.log("Fetching API key...");
+        let apiKeyRef = doc(db, "apikey", "googlegenai");
+        let snapshot = await getDoc(apiKeyRef);
+
+        if (!snapshot.exists()) {
+            console.error("❌ API key document does not exist!");
+            return null;
+        }
+
+        let data = snapshot.data();
+        console.log("📌 Retrieved document data:", data);
+
+        let apiKey = data.key;
+        if (!apiKey) {
+            console.error("⚠️ API key is missing in Firestore document!");
+            return null;
+        }
+
+        console.log("✅ API Key retrieved successfully:", apiKey);
+        return apiKey;  // Return the API key instead of initializing the model here
+    } catch (error) {
+        console.error("🔥 Error fetching API key:", error);
+        return null;
+    }
+}
+
+
+document.addEventListener("DOMContentLoaded", async () => {
+    const aiButton = document.getElementById("send-btn");
+    const aiInput = document.getElementById("chat-input");
+    const chatHistory = document.getElementById("chat-history");
+
+    if (!aiButton || !aiInput || !chatHistory) {
+        console.error("Chatbot UI elements are missing!");
+        return;
+    }
+
+    let apiKey = await getApiKey();
+    if (!apiKey) {
+        appendMessage("Error loading AI model. Please try again later.");
+        return;
+    }
+
+    let genAI = new GoogleGenerativeAI(apiKey);
+    let model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    async function askChatBot(request) {
+        try {
+            if (!model) {
+                console.error("❌ AI model is not initialized!");
+                return "AI model is unavailable.";
+            }
+            let response = await model.generateContent({ contents: [{ role: "user", parts: [{ text: request }] }] });
+            return response.candidates?.[0]?.content || "No response from AI.";
+        } catch (error) {
+            console.error("❌ Error generating content:", error);
+            return "I'm having trouble processing that request.";
+        }
+    }
+
+    aiButton.addEventListener("click", handleChat);
+    aiInput.addEventListener("keypress", (event) => {
+        if (event.key === "Enter") {
+            handleChat();
+        }
+    });
+
+    async function handleChat() {
+        let prompt = aiInput.value.trim().toLowerCase();
+        if (prompt) {
+            if (!ruleChatBot(prompt)) {
+                let response = await askChatBot(prompt);
+                appendMessage(response);
+            }
+        } else {
+            appendMessage("⚠️ Please enter a prompt.");
+        }
+    }
+
+    function appendMessage(message) {
+        let history = document.createElement("div");
+        history.textContent = message;
+        history.className = "history";
+        chatHistory.appendChild(history);
+        aiInput.value = "";
+    }
+
+    async function ruleChatBot(request) {
+        if (request.startsWith("add habit")) {
+            let habitName = request.replace("add habit", "").trim();
+            if (habitName) {
+                try {
+                    let habitDate = new Date().toISOString().split("T")[0]; // Today's date
+                    let habitId = await addHabitToFirestore(habitName, habitDate);
+                    appendMessage(`✅ Habit "${habitName}" added with ID: ${habitId}`);
+                } catch (error) {
+                    appendMessage(`⚠️ Error adding habit: ${error.message}`);
+                }
+            } else {
+                appendMessage("⚠️ Please specify a habit to add.");
+            }
+            return true;
+        } else if (request.startsWith("complete habit")) {
+            let habitName = request.replace("complete habit", "").trim();
+            if (habitName) {
+                if (removeFromHabitName(habitName)) {
+                    appendMessage(`🎯 Habit "${habitName}" marked as complete.`);
+                } else {
+                    appendMessage("⚠️ Habit not found!");
+                }
+            } else {
+                appendMessage("⚠️ Please specify a habit to complete.");
+            }
+            return true;
+        }
+        return false;
+    }
+    
+    function removeFromHabitName(habit) {
+        let ele = document.getElementsByName(habit);
+        if (ele.length === 0) {
+            return false;
+        }
+        ele.forEach((e) => {
+            removeHabit(e.id);
+            removeVisualHabit(e.id);
+        });
+        return true;
+    }
+});
+
+
+
+  
