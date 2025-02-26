@@ -19,7 +19,10 @@ jobs:
             npm install
           fi
 
-      - name: Build Project (if any build step exists)
+      - name: Run linting
+        run: npm run lint
+
+      - name: Build Project (if applicable)
         run: |
           if [ -f package.json ]; then
             npm run build
@@ -29,14 +32,11 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./
-
-      - name: Run linting
-        run: npm run lint
+          publish_dir: ./dist # Change to the correct build folder
 
       - name: Upload logs
         run: |
-          mkdir logs
+          mkdir -p logs
           echo "Logs uploaded on $(date)" > logs/summary.log
           tar -czf logs.tar.gz logs
         continue-on-error: true
