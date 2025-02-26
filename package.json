@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "type": "module",
+  
   "scripts": {
     "start": "parcel assets/html/*.html",
     "build": "parcel build --dist-dir docs --public-url /CheckList/ assets/html/*.html",
