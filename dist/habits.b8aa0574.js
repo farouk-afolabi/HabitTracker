@@ -223,7 +223,7 @@ function getHostname() {
 function getPort() {
     return HMR_PORT || location.port;
 }
-// eslint-disable-next-line no-redeclare
+ 
 var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
     var hostname = getHostname();
@@ -2162,7 +2162,7 @@ function __PRIVATE_indexOffsetComparator(e, t) {
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */ // References to `window` are guarded by SimpleDb.isAvailable()
-/* eslint-disable no-restricted-globals */ const L = "SimpleDb";
+  const L = "SimpleDb";
 /**
  * The maximum number of retry attempts for an IndexedDb transaction that fails
  * with a DOMException.
@@ -13351,7 +13351,7 @@ class __PRIVATE_MemorySharedClientState {
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */ // References to `window` are guarded by BrowserConnectivityMonitor.isAvailable()
-/* eslint-disable no-restricted-globals */ const Qt = "ConnectivityMonitor";
+  const Qt = "ConnectivityMonitor";
 /**
  * Browser implementation of ConnectivityMonitor.
  */ class __PRIVATE_BrowserConnectivityMonitor {
@@ -13777,12 +13777,12 @@ class __PRIVATE_WebChannelConnection extends __PRIVATE_RestConnection {
  * limitations under the License.
  */ /** The Platform's 'window' implementation or null if not available. */ function __PRIVATE_getWindow() {
     // `window` is not always available, e.g. in ReactNative and WebWorkers.
-    // eslint-disable-next-line no-restricted-globals
+     
     return "undefined" != typeof window ? window : null;
 }
 /** The Platform's 'document' implementation or null if not available. */ function getDocument() {
     // `document` is not always available, e.g. in ReactNative and WebWorkers.
-    // eslint-disable-next-line no-restricted-globals
+     
     return "undefined" != typeof document ? document : null;
 }
 /**
@@ -20919,11 +20919,11 @@ process.umask = function() {
  *
  * @author   Feross Aboukhadijeh <https://feross.org>
  * @license  MIT
- */ /* eslint-disable no-proto */ 'use strict';
+ */   'use strict';
 const base64 = require("9c62938f1dccc73c");
 const ieee754 = require("aceacb6a4531a9d2");
-const customInspectSymbol = typeof Symbol === 'function' && typeof Symbol['for'] === 'function' // eslint-disable-line dot-notation
- ? Symbol['for']('nodejs.util.inspect.custom') // eslint-disable-line dot-notation
+const customInspectSymbol = typeof Symbol === 'function' && typeof Symbol['for'] === 'function'  
+ ? Symbol['for']('nodejs.util.inspect.custom')  
  : null;
 exports.Buffer = Buffer;
 exports.SlowBuffer = SlowBuffer;
@@ -22133,7 +22133,7 @@ function E(sym, getMessage, Base) {
             this.name = `${this.name} [${sym}]`;
             // Access the stack to generate the error message including the error code
             // from the name.
-            this.stack // eslint-disable-line no-unused-expressions
+            this.stack  
             ;
             // Reset the name to the actual name.
             delete this.name;
@@ -22317,7 +22317,7 @@ function isInstance(obj, type) {
 }
 function numberIsNaN(obj) {
     // For IE11 support
-    return obj !== obj // eslint-disable-line no-self-compare
+    return obj !== obj  
     ;
 }
 // Create lookup table for `toString('hex')`
@@ -23228,7 +23228,7 @@ function getDbPromise() {
             // behavior is what we want, because if there are multiple versions between
             // the old version and the current version, we want ALL the migrations
             // that correspond to those versions to run, not only the last one.
-            // eslint-disable-next-line default-case
+             
             switch(oldVersion){
                 case 0:
                     try {
@@ -24463,7 +24463,7 @@ const getDefaultsFromCookie = ()=>{
     if (!host) return undefined;
     const separatorIndex = host.lastIndexOf(':'); // Finding the last since IPv6 addr also has colons.
     if (separatorIndex <= 0 || separatorIndex + 1 === host.length) throw new Error(`Invalid host ${host} with no separate hostname and port!`);
-    // eslint-disable-next-line no-restricted-globals
+     
     const port = parseInt(host.substring(separatorIndex + 1), 10);
     if (host[0] === '[') // Bracket-quoted `[ipv6addr]:port` => return "ipv6addr" (without brackets).
     return [
@@ -37773,7 +37773,7 @@ function loadGapi(auth) {
         }
         if ((_b = (_a = _window().gapi) === null || _a === void 0 ? void 0 : _a.iframes) === null || _b === void 0 ? void 0 : _b.Iframe) // If gapi.iframes.Iframe available, resolve.
         resolve(gapi.iframes.getContext());
-        else if (!!((_c = _window().gapi) === null || _c === void 0 ? void 0 : _c.load)) // Gapi loader ready, load gapi.iframes.
+        else if ((_c = _window().gapi) === null || _c === void 0 ? void 0 : _c.load) // Gapi loader ready, load gapi.iframes.
         loadGapiIframe();
         else {
             // Create a new iframe callback when this is called so as not to overwrite
@@ -37785,7 +37785,7 @@ function loadGapi(auth) {
             // GApi loader not available, dynamically load platform.js.
             _window()[cbName] = ()=>{
                 // GApi loader should be ready.
-                if (!!gapi.load) loadGapiIframe();
+                if (gapi.load) loadGapiIframe();
                 else // Gapi loader failed, throw error.
                 reject(_createError(auth, "network-request-failed" /* AuthErrorCode.NETWORK_REQUEST_FAILED */ ));
             };
