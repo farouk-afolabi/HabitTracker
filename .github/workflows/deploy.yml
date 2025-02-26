@@ -1,4 +1,4 @@
-name: Deploy Vanilla JavaScript PWA HabitTracker App
+name: Deploy Vanilla JavaScript HabitTracker App
 
 on:
   push:
@@ -19,10 +19,7 @@ jobs:
             npm install
           fi
 
-      - name: Run linting
-        run: npm run lint
-
-      - name: Build Project (if applicable)
+      - name: Build Project (if any build step exists)
         run: |
           if [ -f package.json ]; then
             npm run build
@@ -32,11 +29,11 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist # Change to the correct build folder
+          publish_dir: ./
 
       - name: Upload logs
         run: |
-          mkdir -p logs
-          echo "Logs uploaded on $(date)" > logs/summary.log
-          tar -czf logs.tar.gz logs
-        continue-on-error: true
+            mkdir logs
+            echo "Logs uploaded on $(date)" > logs/summary.log
+            tar -czf logs.tar.gz logs
+            continue-on-error: true
