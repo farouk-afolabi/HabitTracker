@@ -1,6 +1,6 @@
 // Import Firebase modules
 import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, addDoc, getDocs, getDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
+import { getFirestore} from 'firebase/firestore';
 import { getAuth } from "firebase/auth";
 
 // Initialize Firebase

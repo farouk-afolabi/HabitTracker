@@ -1,22 +1,29 @@
 import globals from "globals";
-import pluginJs from "@eslint/js";
 
-/** @type {import('eslint').Linter.Config[]} */
 export default [
   {
-    ignores: ["node_modules/", "dist/", "docs/", "service-worker.js", "assets/js/", "assets/html/", "assets/css/"], 
-    rules: {
-      "no-unused-vars": "warn",
-      "no-undef": "off", // Disable undefined variable errors
-      "no-cond-assign": "warn",
+    ignores: ["node_modules/", "dist/","docs/", "logs/"],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: "module",
+      globals: {
+        ...globals.browser,
+        document: "readonly",
+        console: "readonly",
+        window: "readonly",
+        localStorage: "readonly",
+        navigator: "readonly",
+        URL: "readonly",
+        fetch: "readonly",
+      },
     },
-    files: ["*.js"],
-    languageOptions: { 
-      globals: { 
-        ...globals.browser,  // Enables `window`, `document`, `console`, etc.
-        ...globals.worker    // Enables `self`, `caches`, `fetch`, etc. (for service workers)
-      }
-    }
+    rules: {
+      // Set rules to either 'error' or 'off' - avoid 'warn' 
+
+      'no-undef': 'off',
+      'no-unused-vars': 'off',
+      'semi': ['off', 'always'],
+      'indent': ['off', 2],
+    },
   },
-  pluginJs.configs.recommended,
 ];

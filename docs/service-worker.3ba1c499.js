@@ -1,0 +1,2 @@
+const s=["/HabitTracker/","/HabitTracker/assets/html/index.html","/HabitTracker/assets/html/habits.html","/HabitTracker/assets/css/style.css","/HabitTracker/assets/js/firebase.js","/HabitTracker/style.css","/HabitTracker/assets/js/habits.js","/HabitTracker/assets/js/signIn.js","/HabitTracker/manifest.json"];self.addEventListener("install",e=>{e.waitUntil(caches.open("habit-tracker-pwa-cache-v1").then(e=>e.addAll(s)))}),self.addEventListener("fetch",s=>{s.respondWith(caches.match(s.request).then(e=>e||fetch(s.request)))});
+//# sourceMappingURL=service-worker.3ba1c499.js.map
