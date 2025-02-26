@@ -1,7 +1,7 @@
 
 # Habit Tracker App
 
-A habit tracking web application powered by Firebase, Parcel, and Google Generative AI for chatbot functionality. Users can add, edit, complete, and monitor their habits over time while choosing the date.
+A habit tracking web application powered by Html,Css, Javascript, Firebase, Parcel, and Google Generative AI for chatbot functionality. Users can add, edit, complete, and monitor their habits over time while choosing the date. They can also add, edit, complete the habit lists using the ai chatbot.
 
 ## Features
 - ✅ **Habit Tracking** – Log and monitor daily habits
